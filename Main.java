@@ -2,27 +2,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-class Main {
+public class Main {
     public static void main(String[] args) {
         try (Scanner scanner = new Scanner(System.in)) {
             String input = scanner.nextLine();
             try {
                 String result = calc(input);
                 System.out.println(result);
-
             } catch (Exception e) {
-                System.out.println("throws Exception");
+                System.out.println("Произошла ошибка: " + e.getMessage());
             }
         }
     }
 
-    /**
-     * Калькулятор, выполняющий операции сложения, вычитания, умножения и деления с двумя числами.
-     *
-     * @param input строка с арифметическим выражением
-     * @return строка с результатом выполнения выражения
-     * @throws Exception в случае ошибок проверки условий
-     */
     public static String calc(String input) throws Exception {
         Map<String, Integer> romanNumerals = new HashMap<>();
         romanNumerals.put("I", 1);
@@ -38,30 +30,32 @@ class Main {
 
         String[] parts = input.split(" ");
         if (parts.length != 3) {
-            throw new Exception("Invalid input");
-        }
-
-        String operation = parts[1];
-        if (!operation.equals("+") && !operation.equals("-") && !operation.equals("*") && !operation.equals("/")) {
-            throw new Exception("Invalid operation");
+            throw new Exception("Неверный ввод");
         }
 
         int num1, num2;
-        if (isNumeric(parts[0]) && isNumeric(parts[2])) {
+        if (isNumeric(parts[0])) {
             num1 = Integer.parseInt(parts[0]);
-            num2 = Integer.parseInt(parts[2]);
-        } else if (romanNumerals.containsKey(parts[0]) && romanNumerals.containsKey(parts[2])) {
+        } else if (romanNumerals.containsKey(parts[0])) {
             num1 = romanNumerals.get(parts[0]);
+        } else {
+            throw new Exception("Неверное значение: " + parts[0]);
+        }
+
+        if (isNumeric(parts[2])) {
+            num2 = Integer.parseInt(parts[2]);
+        } else if (romanNumerals.containsKey(parts[2])) {
             num2 = romanNumerals.get(parts[2]);
         } else {
-            throw new Exception("Input contains both Roman and Arabic numerals");
+            throw new Exception("Неверное значение: " + parts[2]);
         }
 
         if ((num1 < 1 || num1 > 10) || (num2 < 1 || num2 > 10)) {
-            throw new Exception("Numbers must be between 1 and 10");
+            throw new Exception("Вводите, пожалуйста, числа от 1 до 10 включительно");
         }
 
         int result;
+        String operation = parts[1];
         switch (operation) {
             case "+":
                 result = num1 + num2;
@@ -76,7 +70,7 @@ class Main {
                 result = num1 / num2;
                 break;
             default:
-                throw new Exception("Invalid operation");
+                throw new Exception("Неверная операция");
         }
 
         if (isNumeric(parts[0]) && isNumeric(parts[2])) {
@@ -86,30 +80,26 @@ class Main {
         }
     }
 
-    /**
-     * Проверяет, является ли строка числом.
-     *
-     * @param str проверяемая строка
-     * @return true, если строка является числом, иначе - false
-     */
     private static boolean isNumeric(String str) {
         return str.matches("-?\\d+(\\.\\d+)?");
     }
 
-    /**
-     * Преобразует число в римскую систему счисления.
-     *
-     * @param number число
-     * @return строка с числом в римской системе счисления
-     */
     private static String toRoman(int number) {
-        if (number < 1) {
-            throw new IllegalArgumentException("Roman numerals can't represent zero or negative numbers");
+        if (number < 1 || number > 3999) {
+            throw new IllegalArgumentException("Римские цифры только от 1 до 13");
         }
-        if (number > 10) {
-            throw new IllegalArgumentException("Roman numerals can only represent numbers between 1 and 10");
+        String[] romanSymbols = {"I", "IV", "V", "IX", "X", "XL", "L", "XC", "C", "CD", "D", "CM", "M"};
+        int[] romanValues = {1, 4, 5, 9, 10, 40, 50, 90, 100, 400, 500, 900, 1000};
+        StringBuilder result = new StringBuilder();
+        int i = romanSymbols.length - 1;
+        while (number > 0) {
+            if (number - romanValues[i] >= 0) {
+                result.append(romanSymbols[i]);
+                number -= romanValues[i];
+            } else {
+                i--;
+            }
         }
-        String[] romanOnes = {"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
-        return romanOnes[number];
+        return result.toString();
     }
 }
