@@ -33,13 +33,21 @@ public class Main {
             throw new Exception("Неверный ввод");
         }
 
+        boolean isRoman = false, isArabic = false;
+
         int num1, num2;
         if (isNumeric(parts[0])) {
             num1 = Integer.parseInt(parts[0]);
+            isArabic = true;
         } else if (romanNumerals.containsKey(parts[0])) {
             num1 = romanNumerals.get(parts[0]);
+            isRoman = true;
         } else {
             throw new Exception("Неверное значение: " + parts[0]);
+        }
+
+        if (isArabic && isRoman) {
+            throw new Exception("Используйте либо арабские, либо римские числа, но не одновременно");
         }
 
         if (isNumeric(parts[2])) {
@@ -81,12 +89,12 @@ public class Main {
     }
 
     private static boolean isNumeric(String str) {
-        return str.matches("-?\\d+(\\.\\d+)?");
+        return str.matches("-?\\d+(\\.\\d+)?"); // Исправление регулярного выражения
     }
 
     private static String toRoman(int number) {
         if (number < 1 || number > 3999) {
-            throw new IllegalArgumentException("Римские цифры только от 1 до 13");
+            throw new IllegalArgumentException("Римские цифры только от 1 до 3999");
         }
         String[] romanSymbols = {"I", "IV", "V", "IX", "X", "XL", "L", "XC", "C", "CD", "D", "CM", "M"};
         int[] romanValues = {1, 4, 5, 9, 10, 40, 50, 90, 100, 400, 500, 900, 1000};
